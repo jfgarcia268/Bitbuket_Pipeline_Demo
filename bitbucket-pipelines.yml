@@ -15,12 +15,13 @@ pipelines:
           script:
             - echo ${NEW_ENV_SFDX_URL} > env.sfdx
             - sfdx force:auth:sfdxurl:store -d -a ${NEW_ENV_SFDX_URL} -f env.sfdx
-            - rm -rf env.sfdx
             - sfdx force:org:display -u ${NEW_ENV_SFDX_URL}
 
       - step:
           name: SF Deploy
           script:
+            - ls
+            - sfdx force:org:list
             - sfdx force:source:deploy --sourcepath salesforce_sfdx --targetusername ${NEW_ENV_SFDX_URL} --verbose
             - sfdx force:data:tree:import --targetusername ${NEW_ENV_SFDX_URL} --plan sfdx-data/Account-plan.json || true
             - sfdx force:user:permset:assign --targetusername ${NEW_ENV_SFDX_URL} --permsetname HandsetBuy
