@@ -8,6 +8,20 @@ pipelines:
         script:
           - sfdx force
           - vlocity help
+  branches:
+    dev:
+      - step:
+          name: SF Deploy
+          script:
+            - echo ${DEV_CI_SFDX_URL} > env.sfdx
+            - sfdx force:auth:sfdxurl:store -d -a ${NEW_ENV_SFDX_URL} -f env.sfdx
+            - sfdx force:source:deploy --sourcepath salesforce_sfdx --targetusername ${NEW_ENV_SFDX_URL} --verbose
+      - step:
+          name: Vlocity Deploy
+          script:
+           - echo ${DEV_CI_SFDX_URL} > env.sfdx
+           - sfdx force:auth:sfdxurl:store -d -a ${NEW_ENV_SFDX_URL} -f env.sfdx
+           - vlocity -sfdx.username ${NEW_ENV_SFDX_URL} -job Deploy_Delta.yaml packDeploy --verbose true --simpleLogging true
   custom:
     setupNewEnv:
       - step:
