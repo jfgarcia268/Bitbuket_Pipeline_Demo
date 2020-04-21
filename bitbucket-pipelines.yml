@@ -13,16 +13,42 @@ pipelines:
       - step:
           name: SF Deploy
           script:
-            - echo ${DEV_CI_SFDX_URL} > env.sfdx
-            - sfdx force:auth:sfdxurl:store -d -a ${NEW_ENV_SFDX_URL} -f env.sfdx
-            - sfdx force:source:deploy --sourcepath salesforce_sfdx --targetusername ${NEW_ENV_SFDX_URL} --verbose
+            - echo ${SIT_CI_SFDX_URL} > env.sfdx
+            - sfdx force:auth:sfdxurl:store -d -a ${SIT_CI_SFDX_URL} -f env.sfdx
+            - sfdx force:source:deploy --sourcepath salesforce_sfdx --targetusername ${SIT_CI_SFDX_URL} --verbose
+      - step:
+          name: Vlocity Deploy
+          script:
+           - echo ${SIT_CI_SFDX_URL} > env.sfdx
+           - sfdx force:auth:sfdxurl:store -d -a ${SIT_CI_SFDX_URL} -f env.sfdx
+           - vlocity -sfdx.username ${SIT_CI_SFDX_URL} -job Deploy_Delta.yaml packDeploy --verbose true --simpleLogging true
+  custom:
+    prodDeploy:
+      - step:
+          name: SF Deploy
+          script:
+            - echo ${MASTER_PROD_SFDX_URL} > env.sfdx
+            - sfdx force:auth:sfdxurl:store -d -a ${MASTER_PROD_SFDX_URL} -f env.sfdx
+            - sfdx force:source:deploy --sourcepath salesforce_sfdx --targetusername ${MASTER_PROD_SFDX_URL} --verbose
+      - step:
+          name: Vlocity Deploy
+          script:
+           - echo ${MASTER_PROD_SFDX_URL} > env.sfdx
+           - sfdx force:auth:sfdxurl:store -d -a ${MASTER_PROD_SFDX_URL} -f env.sfdx
+           - vlocity -sfdx.username ${MASTER_PROD_SFDX_URL} -job Deploy_Delta.yaml packDeploy --verbose true --simpleLogging true
+    UATDeploy:
+      - step:
+          name: SF Deploy
+          script:
+            - echo ${UAT_SFDX_URL} > env.sfdx
+            - sfdx force:auth:sfdxurl:store -d -a ${UAT_SFDX_URL} -f env.sfdx
+            - sfdx force:source:deploy --sourcepath salesforce_sfdx --targetusername ${UAT_SFDX_URL} --verbose
       - step:
           name: Vlocity Deploy
           script:
            - echo ${DEV_CI_SFDX_URL} > env.sfdx
-           - sfdx force:auth:sfdxurl:store -d -a ${NEW_ENV_SFDX_URL} -f env.sfdx
-           - vlocity -sfdx.username ${NEW_ENV_SFDX_URL} -job Deploy_Delta.yaml packDeploy --verbose true --simpleLogging true
-  custom:
+           - sfdx force:auth:sfdxurl:store -d -a ${UAT_SFDX_URL} -f env.sfdx
+           - vlocity -sfdx.username ${UAT_SFDX_URL} -job Deploy_Delta.yaml packDeploy --verbose true --simpleLogging true
     setupNewEnv:
       - step:
           name: SF Deploy
