@@ -8,6 +8,35 @@ image: jfgarcia268/vlocity_sfdx:v2.0
 pipelines:
   default:
     - step:
+        name: Test
         script:
           - sfdx force
           - vlocity help
+  setupNewEnv:
+    - step:
+        name: SFDX oAuth
+        script:
+          - echo ${NEW_ENV_SFDX_URL} > env.sfdx
+          - sfdx force:auth:sfdxurl:store -d -a ${NEW_ENV_SFDX_URL} -f env.sfdx
+          - rm -rf env.sfdx
+          - sfdx force:org:display -u ${NEW_ENV_SFDX_URL}
+
+    - step:
+        name: SF Deploy
+        script:
+          - sfdx force:source:deploy --sourcepath salesforce_sfdx --targetusername ${SFDX_URL} --verbose
+          - sfdx force:data:tree:import --targetusername ${SFDX_URL} --plan sfdx-data/Account-plan.json || true
+          - sfdx force:user:permset:assign --targetusername ${SFDX_URL} --permsetname HandsetBuy
+
+    - step:
+        name: Vlocity Setup
+        script:
+         - vlocity -sfdx.username ${SFDX_URL} --nojob packUpdateSettings --verbose true --simpleLogging true
+         - vlocity -sfdx.username ${SFDX_URL} --nojob installVlocityInitial --verbose true --simpleLogging true
+         - vlocity -sfdx.username ${SFDX_URL} --nojob runApex -apex apex/cmt_InitializeOrg.cls --verbose true --simpleLogging true
+    
+    - step:
+        name: Vlocity Deploy
+        script:
+         - vlocity -sfdx.username ${SFDX_URL} -job Deploy_Delta.yaml packDeploy --verbose true --simpleLogging true
+         - vlocity -sfdx.username ${SFDX_URL} --nojob runApex -apex apex/RunProductBatchJobs.cls --verbose true --simpleLogging true
