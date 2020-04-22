@@ -46,7 +46,7 @@ pipelines:
       - step:
           name: Vlocity Deploy
           script:
-           - echo ${DEV_CI_SFDX_URL} > env.sfdx
+           - echo ${UAT_SFDX_URL} > env.sfdx
            - sfdx force:auth:sfdxurl:store -d -a ${UAT_SFDX_URL} -f env.sfdx
            - vlocity -sfdx.username ${UAT_SFDX_URL} -job Deploy_Delta.yaml packDeploy --verbose true --simpleLogging true
     setupNewEnv:
