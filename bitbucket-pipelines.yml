@@ -1,13 +1,6 @@
 # Doc: https://confluence.atlassian.com/bitbucket/configure-bitbucket-pipelines-yml-792298910.html
-image: jfgarcia268/vlocity_sfdx:v2.0
-
+image: jfgarcia268/vlocity_sfdx:v4.0
 pipelines:
-  default:
-    - step:
-        name: Test
-        script:
-          - sfdx force
-          - vlocity help
   branches:
     dev:
       - step:
@@ -49,27 +42,3 @@ pipelines:
            - echo ${UAT_SFDX_URL} > env.sfdx
            - sfdx force:auth:sfdxurl:store -d -a ${UAT_SFDX_URL} -f env.sfdx
            - vlocity -sfdx.username ${UAT_SFDX_URL} -job Deploy_Delta.yaml packDeploy --verbose true --simpleLogging true
-    setupNewEnv:
-      - step:
-          name: SF Deploy
-          script:
-            - echo ${NEW_ENV_SFDX_URL} > env.sfdx
-            - sfdx force:auth:sfdxurl:store -d -a ${NEW_ENV_SFDX_URL} -f env.sfdx
-            - sfdx force:source:deploy --sourcepath salesforce_sfdx --targetusername ${NEW_ENV_SFDX_URL} --verbose
-            - sfdx force:data:tree:import --targetusername ${NEW_ENV_SFDX_URL} --plan sfdx-data/Account-plan.json || true
-            - sfdx force:user:permset:assign --targetusername ${NEW_ENV_SFDX_URL} --permsetname HandsetBuy
-      - step:
-          name: Vlocity Setup
-          script:
-           - echo ${NEW_ENV_SFDX_URL} > env.sfdx
-           - sfdx force:auth:sfdxurl:store -d -a ${NEW_ENV_SFDX_URL} -f env.sfdx
-           - vlocity -sfdx.username ${NEW_ENV_SFDX_URL} --nojob packUpdateSettings --verbose true --simpleLogging true
-           - vlocity -sfdx.username ${NEW_ENV_SFDX_URL} --nojob installVlocityInitial --verbose true --simpleLogging true
-           - vlocity -sfdx.username ${NEW_ENV_SFDX_URL} --nojob runApex -apex apex/cmt_InitializeOrg.cls --verbose true --simpleLogging true
-      - step:
-          name: Vlocity Deploy
-          script:
-           - echo ${NEW_ENV_SFDX_URL} > env.sfdx
-           - sfdx force:auth:sfdxurl:store -d -a ${NEW_ENV_SFDX_URL} -f env.sfdx
-           - vlocity -sfdx.username ${NEW_ENV_SFDX_URL} -job Deploy_Delta.yaml packDeploy --verbose true --simpleLogging true
-           - vlocity -sfdx.username ${NEW_ENV_SFDX_URL} --nojob runApex -apex apex/RunProductBatchJobs.cls --verbose true --simpleLogging true
