@@ -1,5 +1,5 @@
 # Doc: https://confluence.atlassian.com/bitbucket/configure-bitbucket-pipelines-yml-792298910.html
-image: jfgarcia268/vlocity_sfdx:v4.0
+image: jfgarcia268/sfdx_vlocity_java:v1.0
 pipelines:
   branches:
     dev:
@@ -14,8 +14,15 @@ pipelines:
           script:
            - echo ${SIT_CI_SFDX_URL} > env.sfdx
            - sfdx force:auth:sfdxurl:store -d -a ${SIT_CI_SFDX_URL} -f env.sfdx
-           - vlocity -sfdx.username ${SIT_CI_SFDX_URL} -job Deploy_Delta.yaml packDeploy --verbose true --simpleLogging true
+           - vlocity -sfdx.username ${SIT_CI_SFDX_URL} -job jobs/deploy.yaml packDeploy --verbose true --simpleLogging true 
   custom:
+    PMDRun:
+      - step:
+          name: PMD Run
+          script:
+            - ./PMD/bin/run.sh pmd -d "./salesforce_sfdx/main/default" -R "./PMD/Rules/quickstart.xml" -f csv > "./pmdresults.csv"
+            - ls -la
+            - mail -s "PMD Results" -t jgonzalez@vlocity.com -A pmdresults.csv
     prodDeploy:
       - step:
           name: SF Deploy
@@ -28,7 +35,7 @@ pipelines:
           script:
            - echo ${MASTER_PROD_SFDX_URL} > env.sfdx
            - sfdx force:auth:sfdxurl:store -d -a ${MASTER_PROD_SFDX_URL} -f env.sfdx
-           - vlocity -sfdx.username ${MASTER_PROD_SFDX_URL} -job Deploy_Delta.yaml packDeploy --verbose true --simpleLogging true
+           - vlocity -sfdx.username ${MASTER_PROD_SFDX_URL} -job jobs/deploy.yaml packDeploy --verbose true --simpleLogging true
     UATDeploy:
       - step:
           name: SF Deploy
@@ -41,4 +48,7 @@ pipelines:
           script:
            - echo ${UAT_SFDX_URL} > env.sfdx
            - sfdx force:auth:sfdxurl:store -d -a ${UAT_SFDX_URL} -f env.sfdx
-           - vlocity -sfdx.username ${UAT_SFDX_URL} -job Deploy_Delta.yaml packDeploy --verbose true --simpleLogging true
+           - vlocity -sfdx.username ${UAT_SFDX_URL} -job jobs/deploy.yaml packDeploy --verbose true --simpleLogging true
+
+
+
