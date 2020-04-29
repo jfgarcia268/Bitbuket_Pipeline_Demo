@@ -20,10 +20,12 @@ pipelines:
       - step:
           name: PMD Run
           script:
-            - ./PMD/bin/run.sh pmd -no-cache -d "./salesforce_sfdx/main/default" -R "./PMD/Rules/quickstart.xml" -f csv > "./pmdresults.csv" || true
+            - rm ./PMD/Results/pmdresults.csv || true
+            - ./PMD/bin/run.sh pmd -no-cache -d "./salesforce_sfdx/main/default" -R "./PMD/Rules/quickstart.xml" -f csv > "./PMD/Results/pmdresults.csv" || true
             - ls -la  
-            - mail --help
-            - echo "PMD Results" | mail -s "PMD Results" jgonzalez@vlocity.com -a From:jgonzalez@vlocity.com -A pmdresults.csv
+            - git add ./PMD/Results/pmdresults.csv
+            - git commit -m "PMD Run Results"
+            - git push
     prodDeploy:
       - step:
           name: SF Deploy
