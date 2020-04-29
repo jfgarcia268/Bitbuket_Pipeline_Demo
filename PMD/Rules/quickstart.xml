@@ -289,15 +289,6 @@
          <property name="cc_block_highlighting" value="false" />
       </properties>
    </rule>
-   <rule ref="category/apex/errorprone.xml/ApexCSRF">
-      <priority>3</priority>
-      <properties>
-         <!-- relevant for Code Climate output only -->
-         <property name="cc_categories" value="Security" />
-         <property name="cc_remediation_points_multiplier" value="100" />
-         <property name="cc_block_highlighting" value="false" />
-      </properties>
-   </rule>
    <rule ref="category/apex/security.xml/ApexOpenRedirect" message="Apex classes should safely redirect to a known location">
       <priority>3</priority>
       <properties>
