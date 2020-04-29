@@ -23,7 +23,7 @@ pipelines:
             - rm ./PMD/Results/pmdresults.csv || true
             - ./PMD/bin/run.sh pmd -no-cache -d "./salesforce_sfdx/main/default" -R "./PMD/Rules/quickstart.xml" -f csv > "./PMD/pmdresults.csv" || true
             - ls -la
-            - ls -la ./PMD/Results
+            - ls -la ./PMD
             - git add ./PMD/pmdresults.csv
             - git commit -m "PMD Run Results"
             - git push
