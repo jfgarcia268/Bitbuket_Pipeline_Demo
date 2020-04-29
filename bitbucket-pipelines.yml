@@ -20,7 +20,7 @@ pipelines:
       - step:
           name: PMD Run
           script:
-            - ./PMD/bin/run.sh pmd -no-cache -d "./salesforce_sfdx/main/default" -R "./PMD/Rules/quickstart.xml" -f csv > "./pmdresults.csv"
+            - ./PMD/bin/run.sh pmd -no-cache -d "./salesforce_sfdx/main/default" -R "./PMD/Rules/quickstart.xml" -f csv > "./pmdresults.csv" || true
             - ls -la
             - mail -s "PMD Results" -t jgonzalez@vlocity.com -A pmdresults.csv
     prodDeploy:
