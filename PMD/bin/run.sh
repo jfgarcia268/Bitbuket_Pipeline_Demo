@@ -106,8 +106,6 @@ jre_specific_vm_options() {
 
   # java_ver is eg "18" for java 1.8, "90" for java 9.0
 
-  java_ver=18
-
   if [ "${APPNAME}" = "designer" ]
   then
     options=""
